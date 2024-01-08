@@ -1,5 +1,10 @@
 # Change Log for CustomImageView
 
+## [Version 3.0.0] - 2024-01-08
+
+### Added
+- Downgrade dart version
+
 ## [Version 2.0.0] - 2024-01-08
 
 ### Added

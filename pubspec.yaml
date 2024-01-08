@@ -1,10 +1,10 @@
 name: custom_image_view
 description: "A Flutter package for displaying images, including network images with caching, SVG, and asset images."
-version: 2.0.0
+version: 3.0.0
 homepage: https://github.com/SahilSelfmade/custom_image_view
 
 environment:
-  sdk: ">=3.2.3 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
