@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 library custom_image_view;
 
 import 'dart:io';
@@ -28,8 +29,12 @@ class CustomImageView extends StatelessWidget {
   final double? height;
   final double? width;
   final Color? color;
+
+  final Widget Function(BuildContext, String, Object)? errorWidget;
+  final Widget Function(BuildContext, Object, StackTrace?)? errorBuilder;
+
   final BoxFit? fit;
-  final String placeHolder;
+  final Widget Function(BuildContext, String)? placeholder;
   final Alignment? alignment;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? margin;
@@ -40,7 +45,7 @@ class CustomImageView extends StatelessWidget {
   ///a [CustomImageView] it can be used for showing any type of images
   /// it will shows the placeholder image if image is not found on network image
   const CustomImageView({
-    super.key,
+    Key? key,
     this.url,
     this.imagePath,
     this.svgPath,
@@ -48,15 +53,17 @@ class CustomImageView extends StatelessWidget {
     this.height,
     this.width,
     this.color,
+    this.errorWidget,
+    this.errorBuilder,
     this.fit,
-    this.placeHolder = 'assets/images/image_not_found.png',
+    this.placeholder,
     this.alignment,
     this.onTap,
     this.margin,
     this.radius,
     this.border,
     this.blendMode,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -135,37 +142,24 @@ class CustomImageView extends StatelessWidget {
         fit: fit,
         imageUrl: url!,
         color: color,
-        placeholder: (context, url) => SizedBox(
-          height: 30,
-          width: 30,
-          child: LinearProgressIndicator(
-            color: Colors.grey.shade200,
-            backgroundColor: Colors.grey.shade100,
-          ),
-        ),
-        errorWidget: (context, url, error) => Image.asset(
-          placeHolder,
+        placeholder: placeholder ??
+            (context, url) => SizedBox(
+                  height: 30,
+                  width: 30,
+                  child: LinearProgressIndicator(
+                    color: Colors.grey.shade200,
+                    backgroundColor: Colors.grey.shade100,
+                  ),
+                ),
+        errorWidget: errorWidget,
+      );
+    } else if (imagePath != null && imagePath!.isNotEmpty) {
+      return Image.asset(imagePath!,
           height: height,
           width: width,
           fit: fit ?? BoxFit.cover,
-        ),
-      );
-    } else if (imagePath != null && imagePath!.isNotEmpty) {
-      return Image.asset(
-        imagePath!,
-        height: height,
-        width: width,
-        fit: fit ?? BoxFit.cover,
-        color: color,
-        errorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            placeHolder,
-            height: height,
-            width: width,
-            fit: fit ?? BoxFit.cover,
-          );
-        },
-      );
+          color: color,
+          errorBuilder: errorBuilder);
     }
     return const SizedBox();
   }

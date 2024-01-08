@@ -11,6 +11,10 @@ CustomImageView is a Flutter package that provides a versatile widget for displa
 - Additional features like margin, border radius, and border styles.
 - Blend mode for applying color filters to SVG images.
 - Efficient network image loading using `CachedNetworkImage` widget.
+- Error handling features added in version 4.0.0:
+  - Custom error widget with `errorWidget` parameter.
+  - Error builder function with `errorBuilder` parameter.
+
 
 ## Getting Started
 
@@ -46,4 +50,4 @@ class DemoApp extends StatelessWidget {
 
 ```yaml
 dependencies:
-  custom_image_view: ^1.0.0
+  custom_image_view: ^4.0.0
