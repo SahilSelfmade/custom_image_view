@@ -1,5 +1,11 @@
 # Change Log for CustomImageView
 
+## [Version 2.0.0] - 2024-01-08
+
+### Added
+- Added licence and some other fixes
+
+
 ## [Version 1.0.0] - 2024-01-08
 
 ### Added
