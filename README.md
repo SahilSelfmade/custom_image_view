@@ -4,7 +4,7 @@ CustomImageView is a Flutter package that provides a versatile widget for displa
 
 ## Features
 
-- Display images from different sources: network, local files, SVGs, etc.
+- Display images from different sources: network, local files[XFile, File], SVGs, etc.
 - Customization options for image properties such as height, width, color, fit, etc.
 - Placeholder image support for cases where the image is not available.
 - Support for onTap callback for user interaction.
