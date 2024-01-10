@@ -8,12 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
-
 class CustomImageView extends StatelessWidget {
   ///[url] is required parameter for fetching network image
   final String? url;
