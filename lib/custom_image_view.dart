@@ -182,18 +182,21 @@ class CustomImageView extends StatelessWidget {
         width: width,
         fit: fit,
         imageUrl: url!,
-        imageBuilder: (context, imageProvider) => Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: imageProvider,
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                color!,
-                BlendMode.color,
-              ),
-            ),
-          ),
-        ),
+        imageBuilder: imageBuilder ??
+            (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                      colorFilter: color != null
+                          ? ColorFilter.mode(
+                              color!,
+                              BlendMode.color,
+                            )
+                          : colorFilter,
+                    ),
+                  ),
+                ),
         placeholder: placeHolder ??
             (context, url) => SizedBox(
                   height: 30,
