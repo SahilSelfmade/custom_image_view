@@ -1,5 +1,11 @@
 # Change Log for CustomImageView
 
+## [Version 5.0.2] - 2024-01-10
+
+### Fixed
+
+- color related issue.
+
 ## [Version 5.0.1] - 2024-01-10
 
 ### Added
