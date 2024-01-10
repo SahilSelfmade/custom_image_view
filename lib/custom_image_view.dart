@@ -28,7 +28,7 @@ class CustomImageView extends StatelessWidget {
   final File? file;
 
   /// The [XFile] which contains the image to be displayed.
-  final XFile? xfile;
+  final XFile? xFile;
 
   /// The height of the image.
   final double? height;
@@ -39,17 +39,23 @@ class CustomImageView extends StatelessWidget {
   /// The color to filter the image with.
   final Color? color;
 
+  /// The color to filter the [SVG_ASSETS] with.
+  final ColorFilter? colorFilter;
+
   /// A widget to display when the image fails to load.
   final Widget Function(BuildContext, String, Object)? errorWidget;
 
   /// A builder function that creates a widget when the image fails to load.
   final Widget Function(BuildContext, Object, StackTrace?)? errorBuilder;
 
+  /// A builder function that creates a widget when the image have some decorations.
+  final Widget Function(BuildContext, ImageProvider<Object>)? imageBuilder;
+
   /// How the image should be inscribed into the space allocated during layout.
   final BoxFit? fit;
 
   /// A placeholder widget to display while the image is being loaded.
-  final Widget Function(BuildContext, String)? placeholder;
+  final Widget Function(BuildContext, String)? placeHolder;
 
   /// The alignment of the image within its frame.
   final Alignment? alignment;
@@ -77,20 +83,22 @@ class CustomImageView extends StatelessWidget {
     this.imagePath,
     this.svgPath,
     this.file,
+    this.xFile,
     this.height,
     this.width,
     this.color,
+    this.colorFilter,
     this.errorWidget,
     this.errorBuilder,
+    this.imageBuilder,
     this.fit,
-    this.placeholder,
+    this.placeHolder,
     this.alignment,
     this.onTap,
     this.margin,
     this.radius,
     this.border,
     this.blendMode,
-    this.xfile,
   }) : super(key: key);
 
   @override
@@ -106,7 +114,7 @@ class CustomImageView extends StatelessWidget {
   Widget _buildWidget() {
     return Padding(
       padding: margin ?? EdgeInsets.zero,
-      child: InkWell(
+      child: GestureDetector(
         onTap: onTap,
         child: _buildCircleImage(),
       ),
@@ -147,12 +155,13 @@ class CustomImageView extends StatelessWidget {
         width: width,
         child: SvgPicture.asset(
           svgPath!,
+          alignment: alignment ?? Alignment.center,
           height: height,
           width: width,
           fit: fit ?? BoxFit.contain,
           colorFilter: color != null
               ? ColorFilter.mode(color!, blendMode ?? BlendMode.srcIn)
-              : null,
+              : colorFilter,
         ),
       );
     } else if (file != null && file!.path.isNotEmpty) {
@@ -162,14 +171,16 @@ class CustomImageView extends StatelessWidget {
         width: width,
         fit: fit ?? BoxFit.cover,
         color: color,
+        alignment: alignment ?? Alignment.center,
       );
-    } else if (xfile != null && xfile!.path.isNotEmpty) {
+    } else if (xFile != null && xFile!.path.isNotEmpty) {
       return Image.file(
-        File(xfile!.path),
+        File(xFile!.path),
         height: height,
         width: width,
         fit: fit ?? BoxFit.cover,
         color: color,
+        alignment: alignment ?? Alignment.center,
       );
     } else if (url != null && url!.isNotEmpty) {
       return CachedNetworkImage(
@@ -177,8 +188,19 @@ class CustomImageView extends StatelessWidget {
         width: width,
         fit: fit,
         imageUrl: url!,
-        color: color,
-        placeholder: placeholder ??
+        imageBuilder: (context, imageProvider) => Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                color!,
+                BlendMode.color,
+              ),
+            ),
+          ),
+        ),
+        placeholder: placeHolder ??
             (context, url) => SizedBox(
                   height: 30,
                   width: 30,
@@ -187,15 +209,19 @@ class CustomImageView extends StatelessWidget {
                     backgroundColor: Colors.grey.shade100,
                   ),
                 ),
+        alignment: alignment ?? Alignment.center,
         errorWidget: errorWidget,
       );
     } else if (imagePath != null && imagePath!.isNotEmpty) {
-      return Image.asset(imagePath!,
-          height: height,
-          width: width,
-          fit: fit ?? BoxFit.cover,
-          color: color,
-          errorBuilder: errorBuilder);
+      return Image.asset(
+        imagePath!,
+        height: height,
+        width: width,
+        fit: fit ?? BoxFit.cover,
+        color: color,
+        errorBuilder: errorBuilder,
+        alignment: alignment ?? Alignment.center,
+      );
     }
     return const SizedBox();
   }
