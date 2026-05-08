@@ -1,5 +1,16 @@
 # Change Log for CustomImageView
 
+## [Version 5.2.0] - 2026-05-08
+
+### Added
+
+- Added `bytes` for in-memory raster image rendering.
+- Added `svgBytes` for in-memory SVG rendering.
+- Added `progressIndicatorBuilder` for raster network download progress UI.
+- Added accessibility support with `semanticsLabel` and `excludeFromSemantics`.
+- Added a complete `example/` Flutter app for pub.dev package previews.
+- Added pub.dev metadata for repository, issue tracker, documentation, and topics.
+
 ## [Version 5.1.0] - 2026-05-08
 
 ### Added

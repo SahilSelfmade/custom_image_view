@@ -12,6 +12,9 @@
 - Asset SVGs through `svgPath`.
 - Automatic `.svg` asset detection when using `imagePath`.
 - Local `File` and `XFile` rendering, including `.svg` local paths.
+- In-memory raster and SVG rendering with `bytes` and `svgBytes`.
+- Download progress UI with `progressIndicatorBuilder`.
+- Accessibility controls with `semanticsLabel` and `excludeFromSemantics`.
 - Web-safe public library: local file rendering is behind conditional imports, so web builds can still use network, asset, SVG, and `XFile` path sources.
 - Shared controls for size, fit, alignment, color, color filter, blend mode, margin, radius, border, tap handling, placeholders, and error builders.
 
@@ -19,7 +22,7 @@
 
 ```yaml
 dependencies:
-  custom_image_view: ^5.1.0
+  custom_image_view: ^5.2.0
 ```
 
 Then import it:
@@ -36,10 +39,12 @@ If more than one source is provided, the widget uses the first available source 
 | --- | --- | --- |
 | 1 | `svgUrl` | Network SVG |
 | 2 | `svgPath` | Asset SVG, network SVG URL |
-| 3 | `file` | Local raster file, local SVG file |
-| 4 | `xFile` | Picked raster file, picked SVG file |
-| 5 | `url` | Cached raster network image, network SVG URL |
-| 6 | `imagePath` | Asset raster image, asset SVG |
+| 3 | `svgBytes` | In-memory SVG bytes |
+| 4 | `bytes` | In-memory raster image bytes |
+| 5 | `file` | Local raster file, local SVG file |
+| 6 | `xFile` | Picked raster file, picked SVG file |
+| 7 | `url` | Cached raster network image, network SVG URL |
+| 8 | `imagePath` | Asset raster image, asset SVG |
 
 ## Caching
 
@@ -57,6 +62,9 @@ CustomImageView(
   maxWidthDiskCache: 600,
   maxHeightDiskCache: 600,
   useOldImageOnUrlChange: true,
+  progressIndicatorBuilder: (context, url, progress) {
+    return CircularProgressIndicator(value: progress.progress);
+  },
 )
 ```
 
@@ -122,6 +130,28 @@ CustomImageView(
   height: 64,
   width: 64,
   fit: BoxFit.cover,
+)
+```
+
+### Memory Image
+
+```dart
+CustomImageView(
+  bytes: imageBytes,
+  height: 100,
+  width: 100,
+  fit: BoxFit.cover,
+)
+```
+
+### Memory SVG
+
+```dart
+CustomImageView(
+  svgBytes: svgBytes,
+  height: 100,
+  width: 100,
+  fit: BoxFit.contain,
 )
 ```
 
@@ -211,10 +241,29 @@ CustomImageView(
   margin: const EdgeInsets.all(8),
   radius: BorderRadius.circular(16),
   border: Border.all(color: Colors.black12),
+  semanticsLabel: 'Profile photo',
   onTap: () {
     // Open preview, profile, gallery, etc.
   },
 )
+```
+
+Hide decorative images from screen readers:
+
+```dart
+CustomImageView(
+  imagePath: 'assets/pattern.png',
+  excludeFromSemantics: true,
+)
+```
+
+## Example App
+
+This package includes an example app with cached network images, cached network SVGs, asset SVGs, memory images, memory SVGs, progress UI, error UI, and cache eviction.
+
+```bash
+cd example
+flutter run
 ```
 
 ## Notes

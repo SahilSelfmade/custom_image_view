@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_image_view/custom_image_view.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +71,38 @@ void main() {
     expect(find.byType(SvgPicture), findsOneWidget);
   });
 
+  testWidgets('renders SVG bytes before other sources', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CustomImageView(
+          svgBytes: Uint8List.fromList(utf8.encode(_validSvg)),
+          url: 'https://example.com/image.png',
+          height: 48,
+          width: 48,
+        ),
+      ),
+    );
+
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.byType(CachedNetworkImage), findsNothing);
+  });
+
+  testWidgets('renders raster bytes before other sources', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CustomImageView(
+          bytes: _transparentPngBytes,
+          url: 'https://example.com/image.png',
+          height: 48,
+          width: 48,
+        ),
+      ),
+    );
+
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.byType(CachedNetworkImage), findsNothing);
+  });
+
   testWidgets('renders an asset image from imagePath', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
@@ -75,6 +110,7 @@ void main() {
           imagePath: 'assets/photo.png',
           height: 48,
           width: 48,
+          semanticsLabel: 'Asset photo',
           errorBuilder: _emptyImageErrorBuilder,
         ),
       ),
@@ -84,6 +120,7 @@ void main() {
     expect(image.width, 48);
     expect(image.height, 48);
     expect(image.fit, BoxFit.cover);
+    expect(image.semanticLabel, 'Asset photo');
   });
 
   testWidgets('prefers explicit svgPath over raster url', (tester) async {
@@ -162,6 +199,7 @@ void main() {
           maxWidthDiskCache: 400,
           maxHeightDiskCache: 300,
           useOldImageOnUrlChange: true,
+          progressIndicatorBuilder: _progressIndicatorBuilder,
         ),
       ),
     );
@@ -176,6 +214,7 @@ void main() {
     expect(cachedImage.maxWidthDiskCache, 400);
     expect(cachedImage.maxHeightDiskCache, 300);
     expect(cachedImage.useOldImageOnUrlChange, isTrue);
+    expect(cachedImage.progressIndicatorBuilder, _progressIndicatorBuilder);
   });
 
   testWidgets('falls back to errorBuilder for SVG failures', (tester) async {
@@ -215,6 +254,14 @@ void main() {
   });
 }
 
+Widget _progressIndicatorBuilder(
+  BuildContext context,
+  String url,
+  DownloadProgress progress,
+) {
+  return const CircularProgressIndicator();
+}
+
 Widget _emptyImageErrorBuilder(
   BuildContext context,
   Object error,
@@ -222,3 +269,13 @@ Widget _emptyImageErrorBuilder(
 ) {
   return const SizedBox.shrink();
 }
+
+const _validSvg = '''
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#000000"/>
+</svg>
+''';
+
+final Uint8List _transparentPngBytes = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
+);

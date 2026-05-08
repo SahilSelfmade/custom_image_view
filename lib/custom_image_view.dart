@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -28,6 +30,12 @@ class CustomImageView extends StatelessWidget {
 
   /// SVG network URL.
   final String? svgUrl;
+
+  /// In-memory raster image bytes.
+  final Uint8List? bytes;
+
+  /// In-memory SVG bytes.
+  final Uint8List? svgBytes;
 
   /// Local image file for mobile and desktop apps.
   final LocalImageFile? file;
@@ -71,6 +79,9 @@ class CustomImageView extends StatelessWidget {
   /// Keeps the old raster network image visible while [url] changes.
   final bool useOldImageOnUrlChange;
 
+  /// Builds progress UI for raster network image downloads.
+  final ProgressIndicatorBuilder? progressIndicatorBuilder;
+
   /// A widget to display when the image fails to load.
   final Widget Function(BuildContext, String, Object)? errorWidget;
 
@@ -107,6 +118,12 @@ class CustomImageView extends StatelessWidget {
   /// The blend mode applied to the image.
   final BlendMode? blendMode;
 
+  /// Semantic label for screen readers.
+  final String? semanticsLabel;
+
+  /// Whether this image should be hidden from the semantics tree.
+  final bool excludeFromSemantics;
+
   /// Creates a widget that displays one image source with shared styling.
   const CustomImageView({
     super.key,
@@ -114,6 +131,8 @@ class CustomImageView extends StatelessWidget {
     this.imagePath,
     this.svgPath,
     this.svgUrl,
+    this.bytes,
+    this.svgBytes,
     this.file,
     this.xFile,
     this.height,
@@ -128,6 +147,7 @@ class CustomImageView extends StatelessWidget {
     this.maxWidthDiskCache,
     this.maxHeightDiskCache,
     this.useOldImageOnUrlChange = false,
+    this.progressIndicatorBuilder,
     this.errorWidget,
     this.errorBuilder,
     this.svgErrorBuilder,
@@ -140,6 +160,8 @@ class CustomImageView extends StatelessWidget {
     this.radius,
     this.border,
     this.blendMode,
+    this.semanticsLabel,
+    this.excludeFromSemantics = false,
   });
 
   /// Removes a network image or SVG from disk cache and Flutter image cache.
@@ -207,7 +229,11 @@ class CustomImageView extends StatelessWidget {
   }
 
   Widget _buildImageView() {
-    if (_hasValue(svgUrl)) {
+    if (svgBytes != null && svgBytes!.isNotEmpty) {
+      return _buildMemorySvg(svgBytes!);
+    } else if (bytes != null && bytes!.isNotEmpty) {
+      return _buildMemoryImage(bytes!);
+    } else if (_hasValue(svgUrl)) {
       return _buildNetworkSvg(svgUrl!);
     } else if (_hasValue(svgPath)) {
       return _isNetworkSvg(svgPath!)
@@ -240,6 +266,22 @@ class CustomImageView extends StatelessWidget {
       width: width,
       fit: fit ?? BoxFit.contain,
       colorFilter: _resolvedColorFilter,
+      semanticsLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      errorBuilder: _resolvedSvgErrorBuilder,
+    );
+  }
+
+  Widget _buildMemorySvg(Uint8List data) {
+    return SvgPicture.memory(
+      data,
+      alignment: alignment ?? Alignment.center,
+      height: height,
+      width: width,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: _resolvedColorFilter,
+      semanticsLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
       errorBuilder: _resolvedSvgErrorBuilder,
     );
   }
@@ -252,6 +294,8 @@ class CustomImageView extends StatelessWidget {
       width: width,
       fit: fit ?? BoxFit.contain,
       colorFilter: _resolvedColorFilter,
+      semanticsLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
       placeholderBuilder: placeHolder == null
           ? null
           : (context) => placeHolder!(context, imageUrl),
@@ -272,6 +316,8 @@ class CustomImageView extends StatelessWidget {
       width: width,
       fit: fit ?? BoxFit.contain,
       colorFilter: _resolvedColorFilter,
+      semanticsLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
       errorBuilder: _resolvedSvgErrorBuilder,
     );
   }
@@ -284,6 +330,8 @@ class CustomImageView extends StatelessWidget {
       fit: fit ?? BoxFit.cover,
       color: color,
       blendMode: blendMode,
+      semanticLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
       errorBuilder: errorBuilder,
       alignment: alignment ?? Alignment.center,
     );
@@ -297,6 +345,8 @@ class CustomImageView extends StatelessWidget {
       width: width,
       fit: fit ?? BoxFit.contain,
       colorFilter: _resolvedColorFilter,
+      semanticsLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
       errorBuilder: _resolvedSvgErrorBuilder,
     );
   }
@@ -309,6 +359,8 @@ class CustomImageView extends StatelessWidget {
       fit: fit ?? BoxFit.cover,
       color: color,
       blendMode: blendMode,
+      semanticLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
       errorBuilder: errorBuilder,
       alignment: alignment ?? Alignment.center,
     );
@@ -322,13 +374,30 @@ class CustomImageView extends StatelessWidget {
       fit: fit ?? BoxFit.cover,
       color: color,
       colorBlendMode: blendMode,
+      semanticLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      errorBuilder: errorBuilder,
+      alignment: alignment ?? Alignment.center,
+    );
+  }
+
+  Widget _buildMemoryImage(Uint8List data) {
+    return Image.memory(
+      data,
+      height: height,
+      width: width,
+      fit: fit ?? BoxFit.cover,
+      color: color,
+      colorBlendMode: blendMode,
+      semanticLabel: semanticsLabel,
+      excludeFromSemantics: excludeFromSemantics,
       errorBuilder: errorBuilder,
       alignment: alignment ?? Alignment.center,
     );
   }
 
   Widget _buildNetworkImage() {
-    return CachedNetworkImage(
+    final image = CachedNetworkImage(
       height: height,
       width: width,
       fit: fit,
@@ -341,30 +410,41 @@ class CustomImageView extends StatelessWidget {
       maxWidthDiskCache: maxWidthDiskCache,
       maxHeightDiskCache: maxHeightDiskCache,
       useOldImageOnUrlChange: useOldImageOnUrlChange,
-      imageBuilder: imageBuilder ??
-          (context, imageProvider) => Container(
-                height: height,
-                width: width,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: imageProvider,
-                    fit: fit ?? BoxFit.cover,
-                    colorFilter: _resolvedColorFilter,
-                    alignment: alignment ?? Alignment.center,
-                  ),
-                ),
-              ),
-      placeholder: placeHolder ??
-          (context, url) => SizedBox(
-                height: height ?? 30,
-                width: width ?? 30,
-                child: LinearProgressIndicator(
-                  color: Colors.grey.shade200,
-                  backgroundColor: Colors.grey.shade100,
-                ),
-              ),
+      progressIndicatorBuilder: progressIndicatorBuilder,
+      color: color,
+      colorBlendMode: blendMode,
+      imageBuilder: imageBuilder,
+      placeholder: progressIndicatorBuilder == null
+          ? placeHolder ?? _defaultPlaceholder
+          : null,
       alignment: alignment ?? Alignment.center,
       errorWidget: errorWidget,
+    );
+    return _wrapNetworkSemantics(image);
+  }
+
+  Widget _defaultPlaceholder(BuildContext context, String url) {
+    return SizedBox(
+      height: height ?? 30,
+      width: width ?? 30,
+      child: LinearProgressIndicator(
+        color: Colors.grey.shade200,
+        backgroundColor: Colors.grey.shade100,
+      ),
+    );
+  }
+
+  Widget _wrapNetworkSemantics(Widget child) {
+    if (excludeFromSemantics) {
+      return ExcludeSemantics(child: child);
+    }
+    if (semanticsLabel == null) {
+      return child;
+    }
+    return Semantics(
+      image: true,
+      label: semanticsLabel,
+      child: ExcludeSemantics(child: child),
     );
   }
 

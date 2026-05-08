@@ -15,6 +15,8 @@ Widget buildLocalRasterImage({
   required Color? color,
   required BlendMode? blendMode,
   required Alignment alignment,
+  required String? semanticLabel,
+  required bool excludeFromSemantics,
   required ImageErrorWidgetBuilder? errorBuilder,
 }) {
   return Image.file(
@@ -25,6 +27,8 @@ Widget buildLocalRasterImage({
     color: color,
     colorBlendMode: blendMode,
     alignment: alignment,
+    semanticLabel: semanticLabel,
+    excludeFromSemantics: excludeFromSemantics,
     errorBuilder: errorBuilder,
   );
 }
@@ -37,6 +41,8 @@ Widget buildLocalRasterPathImage({
   required Color? color,
   required BlendMode? blendMode,
   required Alignment alignment,
+  required String? semanticLabel,
+  required bool excludeFromSemantics,
   required ImageErrorWidgetBuilder? errorBuilder,
 }) {
   return buildLocalRasterImage(
@@ -47,6 +53,8 @@ Widget buildLocalRasterPathImage({
     color: color,
     blendMode: blendMode,
     alignment: alignment,
+    semanticLabel: semanticLabel,
+    excludeFromSemantics: excludeFromSemantics,
     errorBuilder: errorBuilder,
   );
 }
@@ -57,6 +65,8 @@ Widget buildLocalSvgImage({
   required double? width,
   required BoxFit? fit,
   required Alignment alignment,
+  required String? semanticsLabel,
+  required bool excludeFromSemantics,
   required ColorFilter? colorFilter,
   required Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
 }) {
@@ -66,6 +76,8 @@ Widget buildLocalSvgImage({
     width: width,
     fit: fit ?? BoxFit.contain,
     alignment: alignment,
+    semanticsLabel: semanticsLabel,
+    excludeFromSemantics: excludeFromSemantics,
     colorFilter: colorFilter,
     errorBuilder: errorBuilder,
   );
@@ -77,6 +89,8 @@ Widget buildLocalSvgPathImage({
   required double? width,
   required BoxFit? fit,
   required Alignment alignment,
+  required String? semanticsLabel,
+  required bool excludeFromSemantics,
   required ColorFilter? colorFilter,
   required Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
 }) {
@@ -86,6 +100,8 @@ Widget buildLocalSvgPathImage({
     width: width,
     fit: fit,
     alignment: alignment,
+    semanticsLabel: semanticsLabel,
+    excludeFromSemantics: excludeFromSemantics,
     colorFilter: colorFilter,
     errorBuilder: errorBuilder,
   );
