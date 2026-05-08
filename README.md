@@ -22,7 +22,7 @@
 
 ```yaml
 dependencies:
-  custom_image_view: ^5.2.0
+  custom_image_view: ^5.1.1
 ```
 
 Then import it:

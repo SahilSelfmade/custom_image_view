@@ -1,6 +1,6 @@
 # Change Log for CustomImageView
 
-## [Version 5.2.0] - 2026-05-08
+## [Version 5.1.1] - 2026-05-08
 
 ### Added
 
