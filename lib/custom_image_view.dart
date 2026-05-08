@@ -2,21 +2,24 @@
 
 import 'dart:typed_data';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
 
-import 'src/cached_svg_http_client.dart';
 import 'src/local_image_stub.dart'
     if (dart.library.io) 'src/local_image_io.dart';
+import 'src/network_image_stub.dart'
+    if (dart.library.io) 'src/network_image_cached.dart';
+import 'src/network_image_types.dart';
+
+export 'src/network_image_types.dart'
+    show CustomImageDownloadProgress, CustomImageProgressBuilder;
 
 class CustomImageView extends StatelessWidget {
   /// Network image URL.
   ///
-  /// Raster URLs are rendered with [CachedNetworkImage]. URLs ending in `.svg`
-  /// are rendered with [SvgPicture.network].
+  /// Raster URLs are rendered as network images. URLs ending in `.svg` are
+  /// rendered with [SvgPicture.network].
   final String? url;
 
   /// Asset image path.
@@ -55,8 +58,8 @@ class CustomImageView extends StatelessWidget {
   /// The color filter applied to SVGs and decorated network images.
   final ColorFilter? colorFilter;
 
-  /// Cache manager used for raster network images and network SVGs.
-  final BaseCacheManager? cacheManager;
+  /// Optional cache manager used by cached network implementations.
+  final Object? cacheManager;
 
   /// Cache key used for raster network images and network SVGs.
   final String? cacheKey;
@@ -80,7 +83,7 @@ class CustomImageView extends StatelessWidget {
   final bool useOldImageOnUrlChange;
 
   /// Builds progress UI for raster network image downloads.
-  final ProgressIndicatorBuilder? progressIndicatorBuilder;
+  final CustomImageProgressBuilder? progressIndicatorBuilder;
 
   /// A widget to display when the image fails to load.
   final Widget Function(BuildContext, String, Object)? errorWidget;
@@ -168,15 +171,13 @@ class CustomImageView extends StatelessWidget {
   static Future<bool> evictFromCache(
     String url, {
     String? cacheKey,
-    BaseCacheManager? cacheManager,
+    Object? cacheManager,
     double scale = 1,
   }) async {
-    final effectiveCacheManager = cacheManager ?? DefaultCacheManager();
-    await effectiveCacheManager.removeFile(cacheKey ?? url);
-    return CachedNetworkImage.evictFromCache(
+    return evictNetworkImageFromCache(
       url,
       cacheKey: cacheKey,
-      cacheManager: effectiveCacheManager,
+      cacheManager: cacheManager,
       scale: scale,
     );
   }
@@ -301,8 +302,8 @@ class CustomImageView extends StatelessWidget {
           : (context) => placeHolder!(context, imageUrl),
       errorBuilder: _resolvedSvgErrorBuilder,
       headers: httpHeaders,
-      httpClient: CachedSvgHttpClient(
-        cacheManager: cacheManager ?? DefaultCacheManager(),
+      httpClient: buildCachedSvgHttpClient(
+        cacheManager: cacheManager,
         cacheKey: cacheKey,
       ),
     );
@@ -397,11 +398,11 @@ class CustomImageView extends StatelessWidget {
   }
 
   Widget _buildNetworkImage() {
-    final image = CachedNetworkImage(
+    final image = buildNetworkRasterImage(
       height: height,
       width: width,
       fit: fit,
-      imageUrl: url!,
+      url: url!,
       cacheManager: cacheManager,
       cacheKey: cacheKey,
       httpHeaders: httpHeaders,

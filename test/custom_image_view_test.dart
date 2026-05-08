@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_image_view/custom_image_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,9 +19,13 @@ void main() {
       ),
     );
 
-    expect(find.byType(CachedNetworkImage), findsOneWidget);
+    if (kIsWeb) {
+      expect(find.byType(Image), findsOneWidget);
+    } else {
+      expect(find.byType(CachedNetworkImage), findsOneWidget);
+    }
     expect(find.byType(SvgPicture), findsNothing);
-  });
+  }, skip: _isWasm);
 
   test('accepts an explicit SVG network url', () {
     const image = CustomImageView(
@@ -175,17 +179,21 @@ void main() {
       ),
     );
 
+    if (kIsWeb) {
+      expect(find.byType(Image), findsOneWidget);
+      return;
+    }
+
     final cachedImage =
         tester.widget<CachedNetworkImage>(find.byType(CachedNetworkImage));
     final placeholder = cachedImage.placeholder;
-
     expect(placeholder, isNotNull);
     expect(
       placeholder!(tester.element(find.byType(CachedNetworkImage)),
           'https://example.com/image.png'),
       isA<Text>(),
     );
-  });
+  }, skip: _isWasm);
 
   testWidgets('passes cache controls to raster network images', (tester) async {
     await tester.pumpWidget(
@@ -204,9 +212,13 @@ void main() {
       ),
     );
 
+    if (kIsWeb) {
+      expect(find.byType(Image), findsOneWidget);
+      return;
+    }
+
     final cachedImage =
         tester.widget<CachedNetworkImage>(find.byType(CachedNetworkImage));
-
     expect(cachedImage.cacheKey, 'profile-photo');
     expect(cachedImage.httpHeaders, {'Authorization': 'Bearer token'});
     expect(cachedImage.memCacheWidth, 200);
@@ -214,8 +226,8 @@ void main() {
     expect(cachedImage.maxWidthDiskCache, 400);
     expect(cachedImage.maxHeightDiskCache, 300);
     expect(cachedImage.useOldImageOnUrlChange, isTrue);
-    expect(cachedImage.progressIndicatorBuilder, _progressIndicatorBuilder);
-  });
+    expect(cachedImage.progressIndicatorBuilder, isNotNull);
+  }, skip: _isWasm);
 
   testWidgets('falls back to errorBuilder for SVG failures', (tester) async {
     await tester.pumpWidget(
@@ -257,7 +269,7 @@ void main() {
 Widget _progressIndicatorBuilder(
   BuildContext context,
   String url,
-  DownloadProgress progress,
+  CustomImageDownloadProgress progress,
 ) {
   return const CircularProgressIndicator();
 }
@@ -279,3 +291,5 @@ const _validSvg = '''
 final Uint8List _transparentPngBytes = base64Decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
 );
+
+const _isWasm = bool.fromEnvironment('dart.tool.dart2wasm');

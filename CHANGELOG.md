@@ -10,6 +10,8 @@
 - Added accessibility support with `semanticsLabel` and `excludeFromSemantics`.
 - Added a complete `example/` Flutter app for pub.dev package previews.
 - Added pub.dev metadata for repository, issue tracker, documentation, and topics.
+- Replaced the direct `image_picker` dependency with lighter `cross_file` support for `XFile`.
+- Moved cached network image loading behind conditional imports to improve web/WASM compatibility.
 
 ## [Version 5.1.0] - 2026-05-08
 

@@ -1,6 +1,6 @@
 # CustomImageView
 
-`CustomImageView` is a single Flutter widget for the image sources most apps use every day: cached raster network images, network SVGs, asset images, asset SVGs, local files, and `XFile` values from `image_picker`.
+`CustomImageView` is a single Flutter widget for the image sources most apps use every day: cached raster network images, network SVGs, asset images, asset SVGs, local files, and `XFile` values from `cross_file`.
 
 ## Features
 
@@ -15,7 +15,7 @@
 - In-memory raster and SVG rendering with `bytes` and `svgBytes`.
 - Download progress UI with `progressIndicatorBuilder`.
 - Accessibility controls with `semanticsLabel` and `excludeFromSemantics`.
-- Web-safe public library: local file rendering is behind conditional imports, so web builds can still use network, asset, SVG, and `XFile` path sources.
+- Web-safe public library: local file and cached network rendering are behind conditional imports, so web builds can still use network, asset, SVG, and `XFile` path sources.
 - Shared controls for size, fit, alignment, color, color filter, blend mode, margin, radius, border, tap handling, placeholders, and error builders.
 
 ## Installation
