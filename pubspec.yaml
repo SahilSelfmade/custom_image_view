@@ -1,6 +1,6 @@
 name: custom_image_view
 description: "A Flutter widget for cached network images, network SVGs, asset images, asset SVGs, File, and XFile sources."
-version: 5.1.1
+version: 5.1.2
 homepage: https://github.com/SahilSelfmade/custom_image_view
 repository: https://github.com/SahilSelfmade/custom_image_view
 issue_tracker: https://github.com/SahilSelfmade/custom_image_view/issues
