@@ -1,23 +1,30 @@
 name: custom_image_view
-description: "A Flutter package for displaying images, including network images with caching, SVG, and asset images."
-version: 5.0.2
+description: "A Flutter widget for cached network images, network SVGs, asset images, asset SVGs, File, and XFile sources."
+version: 5.1.0
 homepage: https://github.com/SahilSelfmade/custom_image_view
+topics:
+  - flutter
+  - image
+  - svg
+  - cache
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=1.17.0"
+  flutter: ">=3.10.0"
 
 dependencies:
-  cached_network_image: ^3.3.1
-  image_picker: ^1.0.7
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
+  image_picker: ^1.2.2
   flutter:
     sdk: flutter
-  svg_flutter: ^0.0.1
+  flutter_svg: ^2.2.4
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

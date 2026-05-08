@@ -1,5 +1,31 @@
 # Change Log for CustomImageView
 
+## [Version 5.1.0] - 2026-05-08
+
+### Added
+
+- Added network SVG support with the new `svgUrl` parameter.
+- Added cache controls with `cacheManager`, `cacheKey`, `httpHeaders`, memory cache sizing, disk cache sizing, and `useOldImageOnUrlChange`.
+- Added `CustomImageView.evictFromCache(...)` for network raster and SVG cache eviction.
+- Added cache-backed network SVG loading through `flutter_cache_manager`.
+- Added automatic `.svg` URL detection for the existing `url` parameter.
+- Added automatic `.svg` asset detection for the existing `imagePath` parameter.
+- Added SVG rendering support for local `File` and `XFile` paths ending in `.svg`.
+- Added `svgErrorBuilder` for SVG-specific load failures.
+- Added conditional local-file rendering so the public library can compile for Flutter web.
+- Added widget tests for source routing, wrappers, placeholders, tap behavior, and error fallback.
+
+### Changed
+
+- Replaced `svg_flutter` with the maintained `flutter_svg` package.
+- Updated `cached_network_image` to `^3.4.1`.
+- Added direct `flutter_cache_manager` and `http` dependencies for explicit cache-backed SVG network loading.
+- Updated `image_picker` to `^1.2.2`.
+- Updated `flutter_lints` to `^6.0.0`.
+- Updated the Flutter lower bound to `>=3.10.0` to match the Dart 3 package baseline.
+- Improved network image sizing, fitting, alignment, and color filter consistency.
+- Expanded README docs with source priority, platform notes, and examples.
+
 ## [Version 5.0.2] - 2024-01-10
 
 ### Fixed
